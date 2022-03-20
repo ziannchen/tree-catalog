@@ -1,5 +1,5 @@
 <template>
-  <div class="box" ref="box">
+  <div class="box" ref="box" @contextmenu.prevent>
     <div class="left" id="app" ref="left">
       <c-scrollbar
         class="left"
@@ -16,25 +16,57 @@
     </div>
     <div class="resize" title="收缩侧边栏" ref="resize"></div>
 
-    <div class="mid" ref="mid">
+    <div class="mid" ref="mid" @contextmenu="rightClick">
       <!--右侧div内容-->
       {{ rightText }}
       {{ rightText }}
     </div>
   </div>
+  <vue3-menus v-model:open="isOpen" :event="eventVal" :menus="menus" hasIcon>
+  </vue3-menus>
 </template>
 
 <script>
 import VueTree from "./components/VueTree";
 import axios from "axios";
 import { CScrollbar } from "c-scrollbar";
+import { nextTick, ref, shallowRef } from "vue";
+import { Vue3Menus } from "vue3-menus";
 export default {
   name: "app",
   mulu: [],
   mounted() {
     this.dragControllerDiv();
   },
-
+  setup() {
+    const isOpen = ref(false);
+    const eventVal = ref({});
+    function rightClick(event) {
+      isOpen.value = false;
+      nextTick(() => {
+        eventVal.value = event;
+        isOpen.value = true;
+      });
+      event.preventDefault();
+    }
+    const menus = shallowRef([
+      {
+        label: "返回(B)",
+        tip: "Alt+向左箭头",
+        click: () => {
+          window.history.back(-1);
+        },
+      },
+      {
+        label: "点击不关闭菜单",
+        tip: "不关闭菜单",
+        click: () => {
+          return false;
+        },
+      },
+    ]);
+    return { menus, isOpen, rightClick, eventVal };
+  },
   methods: {
     // eslint-disable-next-line
     treeClickEvent(item, treeItem) {
@@ -144,6 +176,7 @@ export default {
   components: {
     VueTree,
     CScrollbar,
+    Vue3Menus,
   },
 };
 </script>
