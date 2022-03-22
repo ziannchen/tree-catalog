@@ -28,6 +28,7 @@
       ></TreeItem>
     </ul>
   </li>
+  <!-- eslint-disable-next-line -->
   <vue3-menus v-model:open="isOpen" :event="eventVal" :menus="menus" hasIcon>
   </vue3-menus>
 </template>
